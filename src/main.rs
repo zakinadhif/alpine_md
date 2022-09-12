@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate diesel;
+
 use actix_web::{web, App, HttpServer, Responder};
 use diesel::PgConnection;
 use diesel::r2d2::{self, ConnectionManager};
@@ -5,6 +8,8 @@ use dotenvy::dotenv;
 
 use handlers::note;
 
+mod models;
+mod schema;
 mod actions;
 mod handlers;
 

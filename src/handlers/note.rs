@@ -1,21 +1,61 @@
-use actix_web::Responder;
+use actix_web::{Responder, web, HttpResponse, Error};
 
-pub async fn create_note() -> impl Responder {
-    "Hello from create_note()!"
+use crate::Pool;
+use crate::models::NotePayload;
+use crate::actions::note as actions;
+use crate::schema::notes;
+
+pub async fn create_note(db: web::Data<Pool>, payload: web::Json<NotePayload>) -> Result<HttpResponse, Error> {
+    let mut db = db.get().unwrap();
+    let payload = payload.into_inner();
+
+    let note = web::block(move || actions::create_note(&mut db, &payload))
+        .await?
+        .map_err(actix_web::error::ErrorInternalServerError)?;
+
+    Ok(HttpResponse::Ok().json(note))
 }
 
-pub async fn get_note() -> impl Responder {
-    "Hello from get_note()!"
+pub async fn get_note(db: web::Data<Pool>, id: web::Path<i32>) -> Result<HttpResponse, Error> {
+    let mut db = db.get().unwrap();
+    let id = id.into_inner();
+
+    let note = web::block(move || actions::get_note(&mut db, id))
+        .await?
+        .map_err(actix_web::error::ErrorInternalServerError)?;
+
+    Ok(HttpResponse::Ok().json(note))
 }
 
-pub async fn index_notes() -> impl Responder {
-    "Hello from index_notes()"
+pub async fn index_notes(db: web::Data<Pool>) -> Result<HttpResponse, Error> {
+    let mut db = db.get().unwrap();
+
+    let notes = web::block(move || actions::index_notes(&mut db))
+        .await?
+        .map_err(actix_web::error::ErrorInternalServerError)?;
+
+    Ok(HttpResponse::Ok().json(notes))
 }
 
-pub async fn update_note() -> impl Responder {
-    "Hello from update_note"
+pub async fn update_note(db: web::Data<Pool>, id: web::Path<i32>, payload: web::Json<NotePayload>) -> Result<HttpResponse, Error> {
+    let mut db = db.get().unwrap();
+    let id = id.into_inner();
+    let payload = payload.into_inner();
+
+    let note = web::block(move || actions::update_note(&mut db, id, &payload))
+        .await?
+        .map_err(actix_web::error::ErrorInternalServerError)?;
+
+    Ok(HttpResponse::Ok().json(note))
 }
 
-pub async fn delete_note() -> impl Responder {
-    "Hello from delete_note()"
+pub async fn delete_note(db: web::Data<Pool>, id: web::Path<i32>) -> Result<HttpResponse, Error> {
+    let mut db = db.get().unwrap();
+    let id = id.into_inner();
+
+    let count_deleted = web::block(move || actions::delete_note(&mut db, id))
+        .await?
+        .map_err(actix_web::error::ErrorInternalServerError)?;
+
+    Ok(HttpResponse::Ok().json(count_deleted))
 }

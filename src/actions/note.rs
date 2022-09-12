@@ -7,7 +7,9 @@ use crate::schema::notes::dsl::*;
 pub fn create_note(db: &mut PgConnection, payload: &NotePayload) -> Result<Note, diesel::result::Error> {
     let new_note = NewNote {
         title: &payload.title,
-        body: &payload.body
+        body: &payload.body,
+        created_at: chrono::Utc::now(),
+        updated_at: chrono::Utc::now()
     };
 
     diesel::insert_into(notes)
@@ -24,7 +26,8 @@ pub fn update_note(db: &mut PgConnection, note_id: i32, payload: &NotePayload) -
     diesel::update(notes.find(note_id))
         .set((
             title.eq(&payload.title),
-            body.eq(&payload.body)
+            body.eq(&payload.body),
+            updated_at.eq(chrono::Utc::now())
         ))
         .get_result(db)
 }

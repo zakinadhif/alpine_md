@@ -17,18 +17,22 @@ use diesel::AsChangeset;
 
 use crate::schema::notes;
 
-#[derive(Queryable, Serialize, Deserialize)]
+#[derive(Queryable, Serialize)]
 pub struct Note {
     pub id: i32,
     pub title: String,
-    pub body: String
+    pub body: String,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(Insertable)]
 #[diesel(table_name = notes)]
 pub struct NewNote<'a> {
     pub title: &'a str,
-    pub body: &'a str
+    pub body: &'a str,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(Deserialize)]

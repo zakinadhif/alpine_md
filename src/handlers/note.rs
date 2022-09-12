@@ -3,7 +3,6 @@ use actix_web::{Responder, web, HttpResponse, Error};
 use crate::Pool;
 use crate::models::NotePayload;
 use crate::actions::note as actions;
-use crate::schema::notes;
 
 pub async fn create_note(db: web::Data<Pool>, payload: web::Json<NotePayload>) -> Result<HttpResponse, Error> {
     let mut db = db.get().unwrap();

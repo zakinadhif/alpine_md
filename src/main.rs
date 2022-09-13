@@ -2,9 +2,11 @@
 extern crate diesel;
 
 use actix_web::{web, App, HttpServer, Responder};
+use actix_web::middleware::Logger;
 use diesel::PgConnection;
 use diesel::r2d2::{self, ConnectionManager};
 use dotenvy::dotenv;
+use env_logger::Env;
 
 use handlers::note;
 
@@ -35,9 +37,12 @@ async fn main() -> std::io::Result<()> {
         .build(manager)
         .expect("Failed to create pool");
 
+    env_logger::init_from_env(Env::default().default_filter_or("info"));
+
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
+            .wrap(Logger::default())
             .route("/", web::get().to(api_banner))
             .service(
                 web::scope("notes")

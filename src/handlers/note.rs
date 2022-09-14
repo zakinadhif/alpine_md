@@ -1,4 +1,4 @@
-use actix_web::{Responder, web, HttpResponse, Error};
+use actix_web::{web, HttpResponse, Error};
 
 use crate::Pool;
 use crate::models::NotePayload;

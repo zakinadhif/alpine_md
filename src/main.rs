@@ -10,6 +10,8 @@ use env_logger::Env;
 
 use handlers::note;
 
+mod extractors;
+mod types;
 mod models;
 mod schema;
 mod actions;

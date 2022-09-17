@@ -46,6 +46,7 @@ pub fn get_note(db: &mut PgConnection, note_id: i32) -> Result<Note, diesel::res
         .get_result(db)
 }
 
-pub fn index_notes(db: &mut PgConnection) -> Result<Vec<Note>, diesel::result::Error> {
-    notes.load(db)
+pub fn index_notes(db: &mut PgConnection, user_id: &str) -> Result<Vec<Note>, diesel::result::Error> {
+    notes.filter(owner.eq(user_id))
+        .load(db)
 }

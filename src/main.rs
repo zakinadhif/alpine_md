@@ -13,6 +13,7 @@ use handlers::note;
 mod extractors;
 mod types;
 mod models;
+mod middlewares;
 mod schema;
 mod actions;
 mod handlers;
@@ -44,6 +45,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
+            .wrap(middlewares::cors())
             .wrap(Logger::default())
             .route("/", web::get().to(api_banner))
             .service(

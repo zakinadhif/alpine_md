@@ -4,8 +4,17 @@ use diesel::prelude::*;
 use crate::models::{NotePayload, NewNote, Note};
 use crate::schema::notes::dsl::*;
 
-pub fn create_note(db: &mut PgConnection, payload: &NotePayload) -> Result<Note, diesel::result::Error> {
+pub fn user_owns_note(db: &mut PgConnection, note_id: i32, user_id: &str) -> Result<bool, diesel::result::Error> {
+    notes.filter(owner.eq(user_id))
+        .find(note_id)
+        .count()
+        .execute(db)
+        .map(|count| count != 0)
+}
+
+pub fn create_note(db: &mut PgConnection, payload: &NotePayload, user_id: &str) -> Result<Note, diesel::result::Error> {
     let new_note = NewNote {
+        owner: user_id,
         title: &payload.title,
         body: &payload.body,
         created_at: chrono::Utc::now(),

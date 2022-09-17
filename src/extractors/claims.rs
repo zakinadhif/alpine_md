@@ -85,6 +85,7 @@ impl ResponseError for ClientError {
 #[derive(Debug, Deserialize)]
 pub struct Claims {
     permissions: Option<HashSet<String>>,
+    pub sub: String
 }
 
 impl Claims {

@@ -20,6 +20,7 @@ use crate::schema::notes;
 #[derive(Queryable, Serialize)]
 pub struct Note {
     pub id: i32,
+    pub owner: String,
     pub title: String,
     pub body: String,
     pub updated_at: chrono::DateTime<chrono::Utc>,
@@ -29,6 +30,7 @@ pub struct Note {
 #[derive(Insertable)]
 #[diesel(table_name = notes)]
 pub struct NewNote<'a> {
+    pub owner: &'a str,
     pub title: &'a str,
     pub body: &'a str,
     pub updated_at: chrono::DateTime<chrono::Utc>,

@@ -1,14 +1,15 @@
 use actix_web::{web, HttpResponse, Error};
 
 use crate::Pool;
+use crate::extractors::claims::Claims;
 use crate::models::NotePayload;
 use crate::actions::note as actions;
 
-pub async fn create_note(db: web::Data<Pool>, payload: web::Json<NotePayload>) -> Result<HttpResponse, Error> {
+pub async fn create_note(db: web::Data<Pool>, payload: web::Json<NotePayload>, claims: Claims) -> Result<HttpResponse, Error> {
     let mut db = db.get().unwrap();
     let payload = payload.into_inner();
 
-    let note = web::block(move || actions::create_note(&mut db, &payload))
+    let note = web::block(move || actions::create_note(&mut db, &payload, &claims.sub))
         .await?
         .map_err(actix_web::error::ErrorInternalServerError)?;
 

@@ -8,7 +8,7 @@ use crate::models::NotePayload;
 use crate::actions::note as actions;
 
 pub async fn create_note(db: web::Data<Pool>, payload: web::Json<NotePayload>, claims: Claims) -> Result<HttpResponse, Error> {
-    if !claims.validate_permissions(&HashSet::from(["create:notes".to_string()])) {
+    if !claims.validate_permissions(&HashSet::from(["write:notes".to_string()])) {
         return Ok(HttpResponse::Forbidden().finish());
     }
 

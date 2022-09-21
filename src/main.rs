@@ -3,6 +3,7 @@ extern crate diesel;
 
 use actix_web::{web, App, HttpServer, Responder};
 use actix_web::middleware::Logger;
+use awc::Client;
 use diesel::PgConnection;
 use diesel::r2d2::{self, ConnectionManager};
 use dotenvy::dotenv;
@@ -44,6 +45,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
+            .app_data(web::Data::new(Client::default()))
             .app_data(web::Data::new(pool.clone()))
             .wrap(middlewares::cors())
             .wrap(Logger::default())

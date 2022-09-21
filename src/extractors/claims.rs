@@ -2,6 +2,7 @@ use actix_web::{
     error::ResponseError,
     http::StatusCode,
     Error, FromRequest, HttpResponse,
+    web
 };
 use awc::Client;
 use actix_web_httpauth::{
@@ -103,6 +104,8 @@ impl FromRequest for Claims {
         _payload: &mut actix_web::dev::Payload,
     ) -> Self::Future {
         let extractor = BearerAuth::extract(req);
+        let client = web::Data::<Client>::extract(req);
+
         Box::pin(async move {
             let credentials = extractor.await.map_err(ClientError::Authentication)?;
             let token = credentials.token();
@@ -110,7 +113,10 @@ impl FromRequest for Claims {
             let kid = header.kid.ok_or_else(|| {
                 ClientError::NotFound("kid not found in token header".to_string())
             })?;
-            let jwks: JwkSet = Client::new()
+            let jwks: JwkSet = client
+                .await
+                .map_err(|_| ClientError::JWKSFetchFailure)?
+                .into_inner()
                 .get(JWKS_URL)
                 .send()
                 .await
